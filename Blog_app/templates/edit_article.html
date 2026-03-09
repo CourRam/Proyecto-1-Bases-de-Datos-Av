@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %} - Editar Artículo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Editar Artículo</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ article.TITLE }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Categoría</label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            {% for cat in categories %}
+                                <option value="{{ cat.CATEGORY_ID }}" 
+                                        {% if cat.CATEGORY_ID == article.CATEGORY_ID %}selected{% endif %}>
+                                    {{ cat.NAME }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Contenido</label>
+                        <textarea class="form-control" id="text" name="text" rows="10" required>{{ article.TEXT }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tag_ids" class="form-label">Tags</label>
+                        <select class="form-select" id="tag_ids" name="tag_ids" multiple size="5">
+                            {% for tag in tags %}
+                                <option value="{{ tag.TAG_ID }}" 
+                                        {% if tag.TAG_ID|string in article.TAG_IDS %}selected{% endif %}>
+                                    {{ tag.NAME }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Actualizar Artículo</button>
+                        <a href="{{ url_for('view_article', url=article.URL) }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <form action="{{ url_for('articles.delete', article_id=article.ARTICLE_ID) }}" 
+                      method="POST" 
+                      onsubmit="return confirm('¿Estás seguro de eliminar este artículo? Esta acción no se puede deshacer.');">
+                    <button type="submit" class="btn btn-danger w-100">Eliminar Artículo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

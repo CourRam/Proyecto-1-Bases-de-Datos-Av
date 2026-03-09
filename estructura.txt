@@ -1,0 +1,27 @@
+blog_app/
+│
+├── .env                   # Variables de entorno (NO subir a git)
+├── .gitignore             # Para ignorar .env y otros archivos
+├── app.py                 # Punto de entrada principal
+├── config.py              # Configuración (DB, secret key)
+├── database.py            # Conexión a Oracle y funciones helper
+├── models.py              # Llamadas a procedimientos PL/SQL
+├── auth.py                # Rutas de autenticación (login/registro)
+├── routes/
+│   ├── __init__.py
+│   ├── articles.py        # Rutas para artículos
+│   ├── comments.py        # Rutas para comentarios
+│   └── users.py           # Rutas para perfil de usuario
+├── templates/             # Plantillas HTML
+│   ├── base.html
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── article.html
+│   ├── create_article.html
+│   └── profile.html
+├── static/                # CSS, JS, imágenes
+│   ├── css/
+│   └── js/
+├── requirements.txt       # Dependencias
+└── test_db.py             # Script de prueba (opcional, no necesario en producción)

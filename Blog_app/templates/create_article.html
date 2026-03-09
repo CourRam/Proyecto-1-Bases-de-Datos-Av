@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %} - Crear Artículo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Crear Nuevo Artículo</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                        <small class="text-muted">Mínimo 5 caracteres</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Categoría</label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="">Selecciona una categoría</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.CATEGORY_ID }}">{{ cat.NAME }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Contenido</label>
+                        <textarea class="form-control" id="text" name="text" rows="10" required></textarea>
+                        <small class="text-muted">Mínimo 10 caracteres</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tag_ids" class="form-label">Tags</label>
+                        <select class="form-select" id="tag_ids" name="tag_ids" multiple size="5">
+                            {% for tag in tags %}
+                                <option value="{{ tag.TAG_ID }}">{{ tag.NAME }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Puedes seleccionar múltiples tags (Ctrl+Click)</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Publicar Artículo</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
