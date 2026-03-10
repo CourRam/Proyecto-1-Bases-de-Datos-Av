@@ -1,4 +1,3 @@
-# routes/articles.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import models
 
@@ -15,8 +14,8 @@ def create():
         title = request.form['title']
         category_id = request.form['category_id']
         text = request.form['text']
-        # Obtener tags seleccionados del multiselect
-        selected_tags = request.form.getlist('tag_ids')  # Cambiado de get a getlist
+        # Obtener tags seleccionados
+        selected_tags = request.form.getlist('tag_ids')  
         tag_ids = ','.join(selected_tags) if selected_tags else None
         
         print(f"Creando artículo: {title}, categoría: {category_id}, tags: {tag_ids}")  # Depuración
@@ -72,7 +71,7 @@ def edit(article_id):
         flash('Debes iniciar sesión', 'error')
         return redirect(url_for('auth.login'))
     
-    # Usar la nueva función en lugar de filtrar la lista
+    
     article = models.get_article_by_id(article_id)
     
     if not article:

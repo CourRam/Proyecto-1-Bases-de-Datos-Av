@@ -45,8 +45,7 @@ def login():
         
         if user_id > 0:
             session['user_id'] = user_id
-            # Obtener nombre del usuario para mostrarlo
-            # Por ahora usamos email, después podemos mejorar
+            
             session['user_email'] = email
             flash('Inicio de sesión exitoso!', 'success')
             return redirect(url_for('index'))

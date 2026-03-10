@@ -1,12 +1,9 @@
-# models.py (versión corregida)
-import oracledb  # <--- IMPORTANTE: agregar esta importación
+import oracledb  
 from database import execute_procedure, execute_function, fetch_all, get_db
 from flask import current_app
 import traceback
 
-# ====================================================
-# MODELOS DE USUARIOS
-# ====================================================
+
 
 def register_user(name, email, password):
     """
@@ -29,7 +26,7 @@ def register_user(name, email, password):
         success_var = cursor.var(int)
         message_var = cursor.var(str)
         
-        # Llamar al procedimiento
+        
         cursor.callproc(
             'register_user',
             [name, email, password, user_id_var, success_var, message_var]
@@ -62,11 +59,11 @@ def login_user(email, password):
         db = get_db()
         cursor = db.cursor()
         
-        # callfunc con el nuevo nombre de función
+        
         result = cursor.callfunc(
-            "loginUser",            # Nombre de la función (sin guión bajo)
-            int,                    # Tipo de retorno (NUMBER en Oracle = int en Python)
-            [email, password]       # Parámetros en el mismo orden que en Oracle
+            "loginUser",            
+            int,                    
+            [email, password]       
         )
         
         return result
@@ -76,9 +73,7 @@ def login_user(email, password):
         import traceback
         current_app.logger.error(traceback.format_exc())
         return -2
-# ====================================================
-# MODELOS DE CATEGORÍAS
-# ====================================================
+
 
 def get_all_categories():
     """Obtener todas las categorías"""
@@ -123,9 +118,7 @@ def create_category(name, description=None):
         current_app.logger.error(f"Error en create_category: {str(e)}")
         return {'success': 0, 'message': str(e), 'category_id': None}
 
-# ====================================================
-# MODELOS DE TAGS
-# ====================================================
+
 
 def get_all_tags():
     """Obtener todos los tags"""
@@ -169,9 +162,7 @@ def create_tag(name):
         current_app.logger.error(f"Error en create_tag: {str(e)}")
         return {'success': 0, 'message': str(e), 'tag_id': None}
 
-# ====================================================
-# MODELOS DE ARTÍCULOS
-# ====================================================
+
 
 def create_article(user_id, category_id, title, text, tag_ids=None):
     """
@@ -370,9 +361,7 @@ def get_user_articles(user_id):
         current_app.logger.error(f"Error en get_user_articles: {str(e)}")
         return []
 
-# ====================================================
-# MODELOS DE COMENTARIOS
-# ====================================================
+
 
 def add_comment(user_id, article_id, text):
     """
