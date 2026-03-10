@@ -3,74 +3,108 @@
 {% block title %} - Inicio{% endblock %}
 
 {% block content %}
+
+
 <h1 class="mb-4">Artículos Recientes</h1>
+
+{% if selected_category or selected_tag or search_term %}
+    <div class="alert alert-info mb-4">
+        <strong>Filtros activos:</strong>
+        {% if selected_category %}
+            <span class="badge bg-info me-2">Categoría: {{ selected_category }}</span>
+        {% endif %}
+        {% if selected_tag %}
+            <span class="badge bg-info me-2">Tag: {{ selected_tag }}</span>
+        {% endif %}
+        {% if search_term %}
+            <span class="badge bg-info me-2">Búsqueda: "{{ search_term }}"</span>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="float-end">Limpiar todos</a>
+    </div>
+{% endif %}
 
 <div class="row">
     <div class="col-md-8">
         {% if articles %}
-            {% for article in articles %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ article.TITLE }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            Por {{ article.AUTHOR }} | {{ article.CATEGORY }}
-                            | {{ article.CREATED_DATE.strftime('%d/%m/%Y') if article.CREATED_DATE else 'Fecha desconocida' }}
-                        </h6>
-                        <p class="card-text">
-                            {{ article.TEXT[:200] + '...' if article.TEXT and article.TEXT|length > 200 else article.TEXT }}
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ url_for('view_article', url=article.URL) }}" class="btn btn-primary btn-sm">Leer más</a>
-                            <small class="text-muted">
-                                👁️ {{ article.VIEWS or 0 }} vistas | 💬 {{ article.COMMENT_COUNT or 0 }} comentarios
-                            </small>
-                        </div>
-                        {% if article.TAGS %}
-                            <div class="mt-2">
-                                <small>Tags: {{ article.TAGS }}</small>
-                            </div>
-                        {% endif %}
-                    </div>
+        {% for article in articles %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ article.TITLE }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    Por {{ article.AUTHOR }} | {{ article.CATEGORY }}
+                    | {{ article.CREATED_DATE.strftime('%d/%m/%Y') if article.CREATED_DATE else 'Fecha desconocida' }}
+                </h6>
+                <p class="card-text">
+                    {{ article.TEXT[:200] + '...' if article.TEXT and article.TEXT|length > 200 else article.TEXT }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('view_article', url=article.URL) }}" class="btn btn-primary btn-sm">Leer más</a>
+                    <small class="text-muted">
+                        👁️ {{ article.VIEWS or 0 }} vistas | 💬 {{ article.COMMENT_COUNT or 0 }} comentarios
+                    </small>
                 </div>
-            {% endfor %}
-        {% else %}
-            <div class="alert alert-info">
-                No hay artículos disponibles. ¡Sé el primero en escribir uno!
+                {% if article.TAGS %}
+                <div class="mt-2">
+                    <small>Tags: {{ article.TAGS }}</small>
+                </div>
+                {% endif %}
             </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-warning">
+            No se encontraron artículos con los filtros seleccionados.
+            <a href="{{ url_for('index') }}">Ver todos los artículos</a>
+        </div>
         {% endif %}
     </div>
-    
-    <div class="col-md-4">
-        <!-- Filtros laterales -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <h5>Categorías</h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled">
-                    {% for cat in categories %}
-                        <li>
-                            <a href="{{ url_for('index', category=cat.URL) }}" class="text-decoration-none">
-                                {{ cat.NAME }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Categorías</h5>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h5>Tags Populares</h5>
-            </div>
-            <div class="card-body">
-                {% for tag in tags %}
-                    <a href="{{ url_for('index', tag=tag.URL) }}" class="badge bg-secondary text-decoration-none me-1">
-                        {{ tag.NAME }}
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <a href="{{ url_for('index') }}"
+                        class="text-decoration-none {% if not selected_category %}fw-bold{% endif %}">
+                        Todas las categorías
                     </a>
+                </li>
+                {% for cat in categories %}
+                <li class="mb-2">
+                    <a href="{{ url_for('index', category=cat.URL) }}"
+                        class="text-decoration-none {% if selected_category == cat.URL %}fw-bold text-primary{% endif %}">
+                        {{ cat.NAME }}
+                        {% if selected_category == cat.URL %}
+                        <span class="badge bg-primary">activo</span>
+                        {% endif %}
+                    </a>
+                </li>
                 {% endfor %}
-            </div>
+            </ul>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Sección de Tags -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Tags Populares</h5>
+        </div>
+        <div class="card-body">
+            <a href="{{ url_for('index') }}"
+                class="badge {% if not selected_tag %}bg-primary{% else %}bg-secondary{% endif %} text-decoration-none me-1 mb-2">
+                Todos
+            </a>
+            {% for tag in tags %}
+            <a href="{{ url_for('index', tag=tag.URL) }}"
+                class="badge {% if selected_tag == tag.URL %}bg-primary{% else %}bg-secondary{% endif %} text-decoration-none me-1 mb-2">
+                {{ tag.NAME }}
+                {% if selected_tag == tag.URL %}
+                ✓
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}

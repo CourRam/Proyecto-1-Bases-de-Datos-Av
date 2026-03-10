@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, redirect, url_for, flash, session
+from flask import Flask, render_template, redirect, url_for, flash, session, request
 from config import Config
 from database import init_app, get_db
 import models
@@ -17,14 +17,31 @@ app.register_blueprint(comments.bp)
 
 @app.route('/')
 def index():
-    """Página principal - muestra todos los artículos"""
-    articles = models.get_articles()
+    """Página principal - muestra todos los artículos con filtros opcionales"""
+    # Obtener parámetros de filtro de la URL
+    category_url = request.args.get('category')
+    tag_url = request.args.get('tag')
+    search = request.args.get('search')
+    
+    print(f"Filtros aplicados - Categoría: {category_url}, Tag: {tag_url}, Búsqueda: {search}")  # Depuración
+    
+    # Obtener artículos filtrados
+    articles = models.get_articles(
+        category_url=category_url,
+        tag_url=tag_url,
+        search_term=search
+    )
+    
     categories = models.get_all_categories()
     tags = models.get_all_tags()
+    
     return render_template('index.html', 
                          articles=articles, 
                          categories=categories, 
                          tags=tags,
+                         selected_category=category_url,
+                         selected_tag=tag_url,
+                         search_term=search,
                          user_id=session.get('user_id'))
 
 @app.route('/article/<path:url>')
