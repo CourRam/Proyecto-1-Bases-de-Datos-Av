@@ -507,3 +507,54 @@ def debug_articles():
     except Exception as e:
         print(f"Error en depuración: {e}")
         return []
+    
+def get_article_by_id(article_id):
+    """
+    Obtener un artículo por su ID
+    
+    Args:
+        article_id: ID del artículo
+    
+    Returns:
+        dict: Artículo o None si no existe
+    """
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        
+        cursor.execute("""
+            SELECT a.article_id, a.title, a.url, a.text, a.created_date, 
+                   a.views, a.user_id as author_id, a.category_id,
+                   u.name as author, c.name as category, c.url as category_url
+            FROM articles a
+            JOIN users u ON a.user_id = u.user_id
+            JOIN categories c ON a.category_id = c.category_id
+            WHERE a.article_id = :1
+        """, [article_id])
+        
+        columns = [col[0] for col in cursor.description]
+        row = cursor.fetchone()
+        
+        if row:
+            article = dict(zip(columns, row))
+            
+            # Obtener tags del artículo
+            cursor.execute("""
+                SELECT t.tag_id, t.name
+                FROM tags t
+                JOIN article_tags at ON t.tag_id = at.tag_id
+                WHERE at.article_id = :1
+            """, [article_id])
+            
+            tags = cursor.fetchall()
+            article['TAGS'] = [{'ID': t[0], 'NAME': t[1]} for t in tags]
+            article['TAG_IDS'] = ','.join([str(t[0]) for t in tags])
+            
+            return article
+        else:
+            return None
+            
+    except Exception as e:
+        current_app.logger.error(f"Error en get_article_by_id: {str(e)}")
+        current_app.logger.error(traceback.format_exc())
+        return None

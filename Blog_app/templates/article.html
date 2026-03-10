@@ -29,18 +29,20 @@
                     {% endif %}
                 </div>
             </div>
-            
+            {% if user_id == article.AUTHOR_ID %}
+                <div class="mb-3">
+                    <a href="{{ url_for('articles.edit', article_id=article.ARTICLE_ID) }}" 
+                        class="btn btn-warning">Editar Artículo</a>
+                </div>
+            {% endif %}
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <span class="badge bg-secondary">👁️ {{ article.VIEWS or 0 }} vistas</span>
                 </div>
                 
-                {% if user_id == article.AUTHOR_ID %}
-                    <div>
-                        <a href="{{ url_for('articles.edit', article_id=article.ARTICLE_ID) }}" 
-                           class="btn btn-warning btn-sm">Editar</a>
-                    </div>
-                {% endif %}
+                <div>
+                    <span class="badge bg-secondary">💬 {{ article.COMMENTS_COUNT or 0 }} comentarios</span>
+                </div>
             </div>
             
             <hr>

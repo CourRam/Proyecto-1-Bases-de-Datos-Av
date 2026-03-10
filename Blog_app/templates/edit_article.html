@@ -34,12 +34,20 @@
                         <textarea class="form-control" id="text" name="text" rows="10" required>{{ article.TEXT }}</textarea>
                     </div>
                     
+                    <!-- En la sección de tags, reemplaza con esto: -->
                     <div class="mb-3">
                         <label for="tag_ids" class="form-label">Tags</label>
                         <select class="form-select" id="tag_ids" name="tag_ids" multiple size="5">
                             {% for tag in tags %}
-                                <option value="{{ tag.TAG_ID }}" 
-                                        {% if tag.TAG_ID|string in article.TAG_IDS %}selected{% endif %}>
+                                {% set selected = false %}
+                                {% if article.TAG_IDS %}
+                                    {% for tag_id in article.TAG_IDS.split(',') %}
+                                        {% if tag.TAG_ID|string == tag_id %}
+                                            {% set selected = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <option value="{{ tag.TAG_ID }}" {% if selected %}selected{% endif %}>
                                     {{ tag.NAME }}
                                 </option>
                             {% endfor %}

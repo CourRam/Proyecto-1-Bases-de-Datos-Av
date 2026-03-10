@@ -64,28 +64,32 @@ def create():
                          categories=models.get_all_categories(),
                          tags=models.get_all_tags())
 
+
 @bp.route('/<int:article_id>/edit', methods=['GET', 'POST'])
 def edit(article_id):
     """Editar un artículo existente"""
     if 'user_id' not in session:
-        flash('Debes iniciar sesión para editar artículos', 'error')
+        flash('Debes iniciar sesión', 'error')
         return redirect(url_for('auth.login'))
     
-    # Obtener el artículo primero para verificar propiedad
-    # Necesitamos una función para obtener artículo por ID
-    # Por ahora, usamos un método temporal
-    articles = models.get_articles(user_id=session['user_id'])
-    article = next((a for a in articles if a['ARTICLE_ID'] == article_id), None)
+    # Usar la nueva función en lugar de filtrar la lista
+    article = models.get_article_by_id(article_id)
     
     if not article:
         flash('Artículo no encontrado', 'error')
+        return redirect(url_for('index'))
+    
+    # Verificar que el usuario sea el propietario
+    if article['AUTHOR_ID'] != session['user_id']:
+        flash('No tienes permiso para editar este artículo', 'error')
         return redirect(url_for('index'))
     
     if request.method == 'POST':
         title = request.form['title']
         category_id = request.form['category_id']
         text = request.form['text']
-        tag_ids = request.form.get('tag_ids', '')
+        selected_tags = request.form.getlist('tag_ids')
+        tag_ids = ','.join(selected_tags) if selected_tags else None
         
         result = models.update_article(
             article_id=article_id,
@@ -97,8 +101,10 @@ def edit(article_id):
         )
         
         if result['success']:
-            flash(result['message'], 'success')
-            return redirect(url_for('view_article', url=title))  # Simplificado, mejor usar URL real
+            flash('Artículo actualizado exitosamente', 'success')
+            # Obtener la URL actualizada del artículo
+            updated_article = models.get_article_by_id(article_id)
+            return redirect(url_for('view_article', url=updated_article['URL']))
         else:
             flash(result['message'], 'error')
     

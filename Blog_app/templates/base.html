@@ -21,6 +21,9 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user_id %}
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('articles.create') }}">Crear Artículo</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">Mi Perfil</a>
                         </li>
                         <li class="nav-item">
