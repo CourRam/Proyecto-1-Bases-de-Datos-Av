@@ -85,9 +85,7 @@ CREATE INDEX idx_articles_category ON articles(category_id);
 CREATE INDEX idx_comments_article ON comments(article_id);
 CREATE INDEX idx_comments_user ON comments(user_id);
 
--- =====================================================
--- VERIFICACIÓN
--- =====================================================
+
 SELECT 'Tablas creadas exitosamente' as estado FROM dual;
 
 -- Mostrar las tablas creadas
