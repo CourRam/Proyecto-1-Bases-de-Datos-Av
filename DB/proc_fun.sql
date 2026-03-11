@@ -1,4 +1,4 @@
--- Función para generar URL amigable a partir de un texto
+-- Función para generar URL 
 CREATE OR REPLACE FUNCTION generate_url(p_text IN VARCHAR2) RETURN VARCHAR2 IS
     v_url VARCHAR2(200);
 BEGIN
@@ -35,7 +35,7 @@ BEGIN
 END generate_url;
 /
 
--- Procedimiento para registrar usuario
+
 CREATE OR REPLACE PROCEDURE register_user(
     p_name IN users.name%TYPE,
     p_email IN users.email%TYPE,
@@ -46,7 +46,7 @@ CREATE OR REPLACE PROCEDURE register_user(
 ) IS
     v_email_count NUMBER;
 BEGIN
-    -- Verificar si el email ya existe
+    
     SELECT COUNT(*) INTO v_email_count FROM users WHERE email = p_email;
     
     IF v_email_count > 0 THEN
@@ -71,7 +71,7 @@ EXCEPTION
 END register_user;
 /
 
--- Función para login
+
 CREATE OR REPLACE FUNCTION login_user(
     p_email IN users.email%TYPE,
     p_password IN users.password%TYPE
@@ -86,12 +86,12 @@ BEGIN
         RETURN v_user_id;
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            RETURN -1;  -- Usuario no encontrado o password incorrecto
+            RETURN -1;  
     END;
 END login_user;
 /
 
--- Procedimiento para crear categoría
+
 CREATE OR REPLACE PROCEDURE create_category(
     p_name IN categories.name%TYPE,
     p_description IN categories.description%TYPE DEFAULT NULL,
@@ -129,7 +129,7 @@ EXCEPTION
 END create_category;
 /
 
--- Procedimiento para crear tag
+
 CREATE OR REPLACE PROCEDURE create_tag(
     p_name IN tags.name%TYPE,
     p_tag_id OUT tags.tag_id%TYPE,
@@ -166,13 +166,13 @@ EXCEPTION
 END create_tag;
 /
 
--- Procedimiento para crear artículo
+
 CREATE OR REPLACE PROCEDURE create_article(
     p_user_id IN articles.user_id%TYPE,
     p_category_id IN articles.category_id%TYPE,
     p_title IN articles.title%TYPE,
     p_text IN articles.text%TYPE,
-    p_tag_ids IN VARCHAR2, -- Lista de tag_ids separados por comas: '1,3,5'
+    p_tag_ids IN VARCHAR2, 
     p_article_id OUT articles.article_id%TYPE,
     p_success OUT NUMBER,
     p_message OUT VARCHAR2
@@ -211,7 +211,7 @@ BEGIN
     INSERT INTO articles (article_id, user_id, category_id, title, url, text, created_date, views)
     VALUES (p_article_id, p_user_id, p_category_id, p_title, v_url, p_text, SYSDATE, 0);
     
-    -- Agregar tags si se proporcionaron
+    
     IF p_tag_ids IS NOT NULL AND LENGTH(TRIM(p_tag_ids)) > 0 THEN
         LOOP
             v_end_pos := INSTR(v_tag_list, ',', v_start_pos);
@@ -225,7 +225,7 @@ BEGIN
                 VALUES (p_article_id, v_tag_id);
             EXCEPTION
                 WHEN OTHERS THEN
-                    NULL; -- Si el tag no existe, simplemente no lo agregamos
+                    NULL; 
             END;
             
             v_start_pos := v_end_pos + 1;
@@ -243,7 +243,7 @@ EXCEPTION
 END create_article;
 /
 
--- Procedimiento para actualizar artículo
+
 CREATE OR REPLACE PROCEDURE update_article(
     p_article_id IN articles.article_id%TYPE,
     p_user_id IN articles.user_id%TYPE, -- Para verificar propiedad
@@ -304,7 +304,7 @@ BEGIN
         text = p_text
     WHERE article_id = p_article_id;
     
-    -- Actualizar tags (borrar y reinsertar)
+   
     DELETE FROM article_tags WHERE article_id = p_article_id;
     
     IF p_tag_ids IS NOT NULL AND LENGTH(TRIM(p_tag_ids)) > 0 THEN
@@ -363,7 +363,7 @@ BEGIN
         RETURN;
     END IF;
     
-    -- Eliminar artículo (las constraints ON DELETE CASCADE eliminarán comments y article_tags)
+    
     DELETE FROM articles WHERE article_id = p_article_id;
     
     COMMIT;
@@ -377,7 +377,7 @@ EXCEPTION
 END delete_article;
 /
 
--- Procedimiento para agregar comentario
+
 CREATE OR REPLACE PROCEDURE add_comment(
     p_user_id IN comments.user_id%TYPE,
     p_article_id IN comments.article_id%TYPE,
@@ -572,7 +572,7 @@ BEGIN
 END get_articles;
 /
 
--- Procedimiento para obtener detalles de un artículo (incluyendo comentarios)
+
 CREATE OR REPLACE PROCEDURE get_article_details(
     p_article_url IN articles.url%TYPE,
     p_article_cursor OUT SYS_REFCURSOR,
@@ -684,11 +684,8 @@ BEGIN
 END get_user_comments;
 /
 
--- =====================================================
--- DATOS DE EJEMPLO (OPCIONAL)
--- =====================================================
 
--- Insertar categorías de ejemplo
+
 DECLARE
     v_cat_id NUMBER;
     v_success NUMBER;
@@ -710,7 +707,6 @@ BEGIN
 END;
 /
 
--- Insertar tags de ejemplo
 DECLARE
     v_tag_id NUMBER;
     v_success NUMBER;
@@ -740,30 +736,3 @@ BEGIN
     COMMIT;
 END;
 /
-
--- Insertar un usuario de ejemplo
-DECLARE
-    v_user_id NUMBER;
-    v_success NUMBER;
-    v_msg VARCHAR2(500);
-BEGIN
-    register_user('John Doe', 'john@example.com', 'password123', v_user_id, v_success, v_msg);
-    DBMS_OUTPUT.PUT_LINE(v_msg);
-    
-    register_user('Jane Smith', 'jane@example.com', 'password123', v_user_id, v_success, v_msg);
-    DBMS_OUTPUT.PUT_LINE(v_msg);
-    
-    COMMIT;
-END;
-/
-
--- =====================================================
--- VERIFICACIÓN FINAL
--- =====================================================
-SELECT 'Procedimientos y funciones creados exitosamente' as estado FROM dual;
-
--- Listar todos los procedimientos y funciones creados
-SELECT object_name, object_type 
-FROM user_objects 
-WHERE object_type IN ('PROCEDURE', 'FUNCTION')
-ORDER BY object_name;

@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from config import Config
 from database import init_app, get_db
